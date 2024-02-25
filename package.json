@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node main.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/LoreviQ/WebCrawler/issues"
   },
-  "homepage": "https://github.com/LoreviQ/WebCrawler#readme"
+  "homepage": "https://github.com/LoreviQ/WebCrawler#readme",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
 }

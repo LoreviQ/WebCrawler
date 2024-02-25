@@ -72,7 +72,12 @@ const decodingMap = {
 function normalizeURL(inURL) {
     const outURL = new URL(percentDecodeURL(inURL));
     outURL.protocol = outURL.protocol.toLowerCase();
-    outURL.hostname = outURL.hostname.toLowerCase();
+    outURL.hostname = outURL.hostname.toLowerCase().replace("www.", "");
+    outURL.pathname = outURL.pathname.replace("//", "/");
+    outURL.hash = "";
+    if (outURL.protocol === "https:") {
+        outURL.protocol = "http:";
+    }
     return outURL.href;
 }
 
@@ -82,7 +87,7 @@ function percentDecodeURL(inURL) {
     while ((i = inURL.indexOf("%", i + 1)) != -1) {
         indexes.push(i);
     }
-    strings = splitAtIndexes(inURL, indexes);
+    strings = splitAtIndexesPercent(inURL, indexes);
     for (let i in strings) {
         if (strings[i].includes("%")) {
             strings[i] = strings[i].toUpperCase();
@@ -94,7 +99,7 @@ function percentDecodeURL(inURL) {
     return strings.join("");
 }
 
-function splitAtIndexes(string, indexes) {
+function splitAtIndexesPercent(string, indexes) {
     if (indexes.length === 0) {
         return [string];
     }
@@ -103,7 +108,7 @@ function splitAtIndexes(string, indexes) {
         string.substring(Number(indexes.slice(-1)) + 3),
     ];
     return [
-        ...splitAtIndexes(
+        ...splitAtIndexesPercent(
             string.substring(0, indexes.slice(-1)),
             indexes.slice(0, -1)
         ),

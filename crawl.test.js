@@ -26,7 +26,7 @@ test("Removing dot-segments", () => {
 });
 
 test('Converting an empty path to a "/" path', () => {
-    expect(normalizeURL("http://example.com")).toBe("http://example.com");
+    expect(normalizeURL("http://example.com")).toBe("http://example.com/");
 });
 
 test("Removing the default port", () => {

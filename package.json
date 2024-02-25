@@ -1,0 +1,20 @@
+{
+  "name": "webcrawler",
+  "version": "1.0.0",
+  "description": "Basic Webcrawler",
+  "main": "index.js",
+  "scripts": {
+    "start": "node main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LoreviQ/WebCrawler.git"
+  },
+  "author": "Oliver Jay",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LoreviQ/WebCrawler/issues"
+  },
+  "homepage": "https://github.com/LoreviQ/WebCrawler#readme"
+}

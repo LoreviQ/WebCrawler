@@ -17,20 +17,19 @@ function percentDecodeURL(inURL) {
 }
 
 function splitAtIndexes(string, indexes) {
-    console.log(`${string} - ${indexes}`);
     if (indexes.length === 0) {
         return [string];
     }
     let strings = [
-        string.substring(Number(indexes.slice(-1)) + 3),
         string.substring(indexes.slice(-1), Number(indexes.slice(-1)) + 3),
+        string.substring(Number(indexes.slice(-1)) + 3),
     ];
     return [
-        ...strings,
         ...splitAtIndexes(
             string.substring(0, indexes.slice(-1)),
             indexes.slice(0, -1)
         ),
+        ...strings,
     ];
 }
 

@@ -118,5 +118,4 @@ function splitAtIndexesPercent(string, indexes) {
 
 module.exports = {
     normalizeURL,
-    percentDecodeURL,
 };

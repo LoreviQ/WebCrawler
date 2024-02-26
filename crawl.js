@@ -76,7 +76,7 @@ async function crawlPage(rootURL, currentURL, pages = null) {
     if (new URL(rootURL).hostname != new URL(currentURL).hostname) {
         return pages;
     }
-    console.log(`------ Crawling ------ ${currentURL}`);
+    process.stdout.write(`\r\x1b[K------ Crawling ------ ${currentURL}`);
     if (!pages) {
         pages = {};
         pages[currentURL] = 0;

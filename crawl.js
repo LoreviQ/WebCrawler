@@ -1,4 +1,5 @@
 const url = require("node:url");
+const { JSDOM } = require("jsdom");
 
 const decodingMap = {
     "%41": "A",
@@ -69,6 +70,25 @@ const decodingMap = {
     "%2D": "-",
 };
 
+function getURLsFromHTML(htmlBody, baseURL) {
+    const dom = new JSDOM(htmlBody);
+    const hyperlinks = dom.window.document.querySelectorAll("a");
+    let output = [];
+    for (let hyperlink of hyperlinks) {
+        try {
+            hyperlink = hyperlink.href;
+            let newURL =
+                hyperlink[0] === "/"
+                    ? new URL(hyperlink, baseURL)
+                    : new URL(hyperlink);
+            output = [...output, newURL.href];
+        } catch (err) {
+            console.log(`${err.message}: ${hyperlink.href}`);
+        }
+    }
+    return output;
+}
+
 function normalizeURL(inURL) {
     const outURL = new URL(percentDecodeURL(inURL));
     outURL.protocol = outURL.protocol.toLowerCase();
@@ -81,13 +101,18 @@ function normalizeURL(inURL) {
     return outURL.href;
 }
 
-function percentDecodeURL(inURL) {
+function indexesOf(string, substring) {
     let indexes = [];
     let i = -1;
-    while ((i = inURL.indexOf("%", i + 1)) != -1) {
+    while ((i = string.indexOf(substring, i + 1)) != -1) {
         indexes.push(i);
     }
-    strings = splitAtIndexesPercent(inURL, indexes);
+    return indexes;
+}
+
+function percentDecodeURL(inURL) {
+    const indexes = indexesOf(inURL, "%");
+    const strings = splitAtIndexesPercent(inURL, indexes);
     for (let i in strings) {
         if (strings[i].includes("%")) {
             strings[i] = strings[i].toUpperCase();
@@ -103,7 +128,7 @@ function splitAtIndexesPercent(string, indexes) {
     if (indexes.length === 0) {
         return [string];
     }
-    let strings = [
+    const strings = [
         string.substring(indexes.slice(-1), Number(indexes.slice(-1)) + 3),
         string.substring(Number(indexes.slice(-1)) + 3),
     ];
@@ -118,4 +143,5 @@ function splitAtIndexesPercent(string, indexes) {
 
 module.exports = {
     normalizeURL,
+    getURLsFromHTML,
 };

@@ -1,54 +1,111 @@
 const { test, expect } = require("@jest/globals");
-const { normalizeURL } = require("./crawl.js");
+const { normalizeURL, getURLsFromHTML } = require("./crawl.js");
 
 test("Converting percent-encoded triplets to uppercase", () => {
-    expect(normalizeURL("http://example.com/foo%2a")).toBe(
-        "http://example.com/foo%2A"
-    );
+    const input = "http://example.com/foo%2a";
+    const output = normalizeURL(input);
+    const expected = "http://example.com/foo%2A";
+    expect(output).toBe(expected);
 });
 
 test("Converting the scheme and host to lowercase", () => {
-    expect(normalizeURL("HTTP://User@Example.COM/Foo")).toBe(
-        "http://User@example.com/Foo"
-    );
+    const input = "HTTP://User@Example.COM/Foo";
+    const output = normalizeURL(input);
+    const expected = "http://User@example.com/Foo";
+    expect(output).toBe(expected);
 });
 
 test("Decoding percent-encoded triplets of unreserved characters", () => {
-    expect(normalizeURL("http://example.com/%7Efoo")).toBe(
-        "http://example.com/~foo"
-    );
+    const input = "http://example.com/%7Efoo";
+    const output = normalizeURL(input);
+    const expected = "http://example.com/~foo";
+    expect(output).toBe(expected);
 });
 
 test("Removing dot-segments", () => {
-    expect(normalizeURL("http://example.com/foo/./bar/baz/../qux")).toBe(
-        "http://example.com/foo/bar/qux"
-    );
+    const input = "http://example.com/foo/./bar/baz/../qux";
+    const output = normalizeURL(input);
+    const expected = "http://example.com/foo/bar/qux";
+    expect(output).toBe(expected);
 });
 
 test('Converting an empty path to a "/" path', () => {
-    expect(normalizeURL("http://example.com")).toBe("http://example.com/");
+    const input = "http://example.com";
+    const output = normalizeURL(input);
+    const expected = "http://example.com/";
+    expect(output).toBe(expected);
 });
 
 test("Removing the default port", () => {
-    expect(normalizeURL("http://example.com:80/")).toBe("http://example.com/");
+    const input = "http://example.com:80/";
+    const output = normalizeURL(input);
+    const expected = "http://example.com/";
+    expect(output).toBe(expected);
 });
 
 test("Removing the fragment", () => {
-    expect(normalizeURL("http://example.com/bar.html#section1")).toBe(
-        "http://example.com/bar.html"
-    );
+    const input = "http://example.com/bar.html#section1";
+    const output = normalizeURL(input);
+    const expected = "http://example.com/bar.html";
+    expect(output).toBe(expected);
 });
 
 test("Limiting protocols", () => {
-    expect(normalizeURL("https://example.com/")).toBe("http://example.com/");
+    const input = "https://example.com/";
+    const output = normalizeURL(input);
+    const expected = "http://example.com/";
+    expect(output).toBe(expected);
 });
 
 test("Removing duplicate slashes", () => {
-    expect(normalizeURL("http://example.com/foo//bar.html")).toBe(
-        "http://example.com/foo/bar.html"
-    );
+    const input = "http://example.com/foo//bar.html";
+    const output = normalizeURL(input);
+    const expected = "http://example.com/foo/bar.html";
+    expect(output).toBe(expected);
 });
 
 test("Removing or adding “www” as the first domain label", () => {
-    expect(normalizeURL("http://www.example.com/")).toBe("http://example.com/");
+    const input = "http://www.example.com/";
+    const output = normalizeURL(input);
+    const expected = "http://example.com/";
+    expect(output).toBe(expected);
+});
+
+test("getURLsFromHTML absolute", () => {
+    const inputURL = "https://blog.boot.dev";
+    const inputBody =
+        '<html><body><a href="https://blog.boot.dev"><span>Boot.dev></span></a></body></html>';
+    const actual = getURLsFromHTML(inputBody, inputURL);
+    const expected = ["https://blog.boot.dev/"];
+    expect(actual).toEqual(expected);
+});
+
+test("getURLsFromHTML relative", () => {
+    const inputURL = "https://blog.boot.dev";
+    const inputBody =
+        '<html><body><a href="/path/one"><span>Boot.dev></span></a></body></html>';
+    const actual = getURLsFromHTML(inputBody, inputURL);
+    const expected = ["https://blog.boot.dev/path/one"];
+    expect(actual).toEqual(expected);
+});
+
+test("getURLsFromHTML both", () => {
+    const inputURL = "https://blog.boot.dev";
+    const inputBody =
+        '<html><body><a href="/path/one"><span>Boot.dev></span></a><a href="https://other.com/path/one"><span>Boot.dev></span></a></body></html>';
+    const actual = getURLsFromHTML(inputBody, inputURL);
+    const expected = [
+        "https://blog.boot.dev/path/one",
+        "https://other.com/path/one",
+    ];
+    expect(actual).toEqual(expected);
+});
+
+test("getURLsFromHTML handle error", () => {
+    const inputURL = "https://blog.boot.dev";
+    const inputBody =
+        '<html><body><a href="path/one"><span>Boot.dev></span></a></body></html>';
+    const actual = getURLsFromHTML(inputBody, inputURL);
+    const expected = [];
+    expect(actual).toEqual(expected);
 });

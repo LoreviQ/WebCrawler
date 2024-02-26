@@ -1,4 +1,5 @@
 const { argv } = require("node:process");
+const { crawlPage } = require("./crawl.js");
 
 function main() {
     if (argv.length != 3) {
@@ -6,6 +7,7 @@ function main() {
     }
     rootURL = argv[2];
     console.log(`Crawling at: ${rootURL}`);
+    crawlPage(rootURL);
 }
 
 main();

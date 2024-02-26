@@ -70,6 +70,21 @@ const decodingMap = {
     "%2D": "-",
 };
 
+async function crawlPage(rootURL) {
+    try {
+        const response = await fetch(rootURL);
+        if (response.status >= 400) {
+            throw Error(`HTTP Error Code: ${response.status}`);
+        }
+        if (!response.headers.get("Content-Type").includes("text/html")) {
+            throw Error(`Content type is not 'text/html'`);
+        }
+        console.log(await response.text());
+    } catch (err) {
+        console.log(err.message);
+    }
+}
+
 function getURLsFromHTML(htmlBody, baseURL) {
     const dom = new JSDOM(htmlBody);
     const hyperlinks = dom.window.document.querySelectorAll("a");
@@ -144,4 +159,5 @@ function splitAtIndexesPercent(string, indexes) {
 module.exports = {
     normalizeURL,
     getURLsFromHTML,
+    crawlPage,
 };

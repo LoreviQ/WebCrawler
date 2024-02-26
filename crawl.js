@@ -70,7 +70,22 @@ const decodingMap = {
     "%2D": "-",
 };
 
-async function crawlPage(rootURL) {
+async function crawlPage(rootURL, currentURL, pages = null) {
+    rootURL = normalizeURL(rootURL);
+    currentURL = normalizeURL(currentURL);
+    if (new URL(rootURL).hostname != new URL(currentURL).hostname) {
+        return pages;
+    }
+    console.log(`------ Crawling ------ ${currentURL}`);
+    if (!pages) {
+        pages = {};
+        pages[currentURL] = 0;
+    } else if (currentURL in pages) {
+        pages[currentURL]++;
+        return pages;
+    } else {
+        pages[currentURL] = 1;
+    }
     try {
         const response = await fetch(rootURL);
         if (response.status >= 400) {
@@ -79,10 +94,16 @@ async function crawlPage(rootURL) {
         if (!response.headers.get("Content-Type").includes("text/html")) {
             throw Error(`Content type is not 'text/html'`);
         }
-        console.log(await response.text());
+        htmlBody = await response.text();
     } catch (err) {
         console.log(err.message);
+        return pages;
     }
+    const newURLs = getURLsFromHTML(htmlBody, rootURL);
+    for (let newURL of newURLs) {
+        pages = await crawlPage(rootURL, newURL, pages);
+    }
+    return pages;
 }
 
 function getURLsFromHTML(htmlBody, baseURL) {
